@@ -378,6 +378,8 @@ class Parser(object):
             completely parsed into meaningful data for further processing
         '''
 
+        pattern = ''
+
         if (part_type == PART_CPU):
             pattern = PATTERN_CPU
         elif (part_type == PART_MEM):
@@ -416,7 +418,6 @@ class Parser(object):
                         ('%s_%s XX %s' % (
                             part_line[:8], part_line[9:11], part_line[12:]
                         ))
-                    print "* " + part_line
 
                 # Line is not empty, nor it's header.
                 # let's hit the road Jack!
@@ -424,8 +425,6 @@ class Parser(object):
                 full_time = elems[0].strip()
 
                 if (full_time != "Average:"):
-
-                    print "< %s" % (full_time)
 
                     # Convert time to 24hr format if needed
                     if is_24hr is False:
@@ -442,124 +441,61 @@ class Parser(object):
                             hours = ('%02d' % (hours,))
                             full_time = ('%s:%s' % (hours, full_time[3:]))
 
-                    print "> %s" % (full_time)
-
                     try:
                         blah = return_dict[full_time]
                         del(blah)
                     except KeyError:
                         return_dict[full_time] = {}
 
+                    # CPU usage summary
                     if (part_type == PART_CPU):
-                        return_dict[full_time][elems[
-                            (1 if is_24hr is True else 2)
-                        ]] = {
-                            'usr': float(elems[
-                                self.__cpu_fields[
-                                    FIELD_PAIRS_CPU['usr']]])
-                            if FIELD_PAIRS_CPU['usr'] is not None
-                            else None,
-                            'nice': float(elems[
-                                self.__cpu_fields[
-                                    FIELD_PAIRS_CPU['nice']]])
-                            if FIELD_PAIRS_CPU['nice'] is not None
-                            else None,
-                            'sys': float(elems[
-                                self.__cpu_fields[
-                                    FIELD_PAIRS_CPU['sys']]])
-                            if FIELD_PAIRS_CPU['sys'] is not None
-                            else None,
-                            'iowait': float(elems[
-                                self.__cpu_fields[
-                                    FIELD_PAIRS_CPU['iowait']]])
-                            if FIELD_PAIRS_CPU['iowait'] is not None
-                            else None,
-                            'idle': float(elems[
-                                self.__cpu_fields[
-                                    FIELD_PAIRS_CPU['idle']]])
-                            if FIELD_PAIRS_CPU['idle'] is not None
-                            else None
-                        }
+                        cpuid = elems[(1 if is_24hr is True else 2)]
 
+                        try:
+                            blah = return_dict[full_time][cpuid]
+                            del(blah)
+                        except KeyError:
+                            return_dict[full_time][cpuid] = {}
+
+                        for sectionname in FIELD_PAIRS_CPU.iterkeys():
+                            return_dict[full_time][cpuid][sectionname] = \
+                                float(elems[self.__cpu_fields[
+                                    FIELD_PAIRS_CPU[sectionname]]])
+
+                    # RAM memory usage summary
                     if (part_type == PART_MEM):
-                        # RAM memory usage summary
-                        return_dict[full_time] = {
-                            'memfree': int(elems[
-                                self.__mem_fields[
-                                    FIELD_PAIRS_MEM['memfree']]])
-                            if FIELD_PAIRS_MEM['memfree'] is not None
-                            else None,
-                            'memused': int(elems[
-                                self.__mem_fields[
-                                    FIELD_PAIRS_MEM['memused']]])
-                            if FIELD_PAIRS_MEM['memused'] is not None
-                            else None,
-                            'memusedpercent': float(elems[
-                                self.__mem_fields[
-                                    FIELD_PAIRS_MEM['memusedpercent']]])
-                            if FIELD_PAIRS_MEM['memusedpercent'] is not None
-                            else None,
-                            'membuffer': int(elems[
-                                self.__mem_fields[
-                                    FIELD_PAIRS_MEM['membuffer']]])
-                            if FIELD_PAIRS_MEM['membuffer'] is not None
-                            else None,
-                            'memcache': int(elems[
-                                self.__mem_fields[
-                                    FIELD_PAIRS_MEM['memcache']]])
-                            if FIELD_PAIRS_MEM['memcache'] is not None
-                            else None
-                        }
+                        for sectionname in FIELD_PAIRS_MEM.iterkeys():
+                            value = elems[self.__mem_fields[
+                                FIELD_PAIRS_MEM[sectionname]]]
 
+                            if sectionname == 'memusedpercent':
+                                value = float(value)
+                            else:
+                                value = int(value)
+
+                            return_dict[full_time][sectionname] = \
+                                value
+
+                    # Swap usage summary
                     if (part_type == PART_SWP):
-                        # Swap usage summary
-                        return_dict[full_time] = {
-                            'swapfree': int(elems[
-                                self.__swp_fields[
-                                    FIELD_PAIRS_SWP['swapfree']]])
-                            if FIELD_PAIRS_SWP['swapfree'] is not None
-                            else None,
-                            'swapused': int(elems[
-                                self.__swp_fields[
-                                    FIELD_PAIRS_SWP['swapused']]])
-                            if FIELD_PAIRS_SWP['swapused'] is not None
-                            else None,
-                            'swapusedpercent': float(elems[
-                                self.__swp_fields[
-                                    FIELD_PAIRS_SWP['swapusedpercent']]])
-                            if FIELD_PAIRS_SWP['swapusedpercent'] is not None
-                            else None
-                        }
+                        for sectionname in FIELD_PAIRS_SWP.iterkeys():
+                            value = elems[self.__swp_fields[
+                                FIELD_PAIRS_SWP[sectionname]]]
 
+                            if sectionname == 'swapusedpercent':
+                                value = float(value)
+                            else:
+                                value = int(value)
+
+                            return_dict[full_time][sectionname] = \
+                                value
+
+                    # IO usage summary
                     if (part_type == PART_IO):
-                        # IO usage summary
-                        return_dict[full_time] = {
-                            'bread': float(elems[
-                                self.__io_fields[
-                                    FIELD_PAIRS_IO['bread']]])
-                            if FIELD_PAIRS_IO['bread'] is not None
-                            else None,
-                            'bwrite': float(elems[
-                                self.__io_fields[
-                                    FIELD_PAIRS_IO['bwrite']]])
-                            if FIELD_PAIRS_IO['bwrite'] is not None
-                            else None,
-                            'tps': float(elems[
-                                self.__io_fields[
-                                    FIELD_PAIRS_IO['tps']]])
-                            if FIELD_PAIRS_IO['tps'] is not None
-                            else None,
-                            'rtps': float(elems[
-                                self.__io_fields[
-                                    FIELD_PAIRS_IO['rtps']]])
-                            if FIELD_PAIRS_IO['rtps'] is not None
-                            else None,
-                            'wtps': float(elems[
-                                self.__io_fields[
-                                    FIELD_PAIRS_IO['wtps']]])
-                            if FIELD_PAIRS_IO['wtps'] is not None
-                            else None
-                        }
+                        for sectionname in FIELD_PAIRS_IO.iterkeys():
+                            return_dict[full_time][sectionname] = \
+                                float(elems[self.__io_fields[
+                                    FIELD_PAIRS_IO[sectionname]]])
 
         return (return_dict)
 
