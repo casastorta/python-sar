@@ -12,7 +12,7 @@ def main():
     from sar import parser
 
     sysstat_dir = '/var/log/sa'
-    single_file = ('%s/%s' % (sysstat_dir, 'sar05'))
+    single_file = ('%s/%s' % (sysstat_dir, 'sar21'))
 
     # Single SAR file parsing
     insar = parser.Parser(single_file)

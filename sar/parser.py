@@ -405,12 +405,49 @@ class Parser(object):
             if (part_line.strip() != '') and \
                     not pattern_re.search(part_line):
 
+                # Take care of AM/PM timestamps in SAR file
+                is_24hr = True
+                is_AM = False
+
+                if part_line[9:11] == 'AM':
+                    is_24hr = False
+                    is_AM = True
+                elif part_line[9:11] == 'PM':
+                    is_24hr = False
+                    is_AM = False
+
+                if is_24hr is False:
+                    part_line =  \
+                        ('%s_%s XX %s' % (
+                            part_line[:8], part_line[9:11], part_line[12:]
+                        ))
+                    print "* " + part_line
+
                 # Line is not empty, nor it's header.
                 # let's hit the road Jack!
                 elems = part_line.split()
                 full_time = elems[0].strip()
 
                 if (full_time != "Average:"):
+
+                    print "< %s" % (full_time)
+
+                    # Convert time to 24hr format if needed
+                    if is_24hr is False:
+                        full_time = full_time[:-3]
+
+                        # 12 is a bitch in AM/PM notation
+                        if full_time[:2] == '12':
+                            if is_AM is True:
+                                full_time = ('%s:%s' % ('00', full_time[3:]))
+                            is_AM = not is_AM
+
+                        if is_AM is False and full_time[0:2] != '00':
+                            hours = int(full_time[:2]) + 12
+                            hours = ('%02d' % (hours,))
+                            full_time = ('%s:%s' % (hours, full_time[3:]))
+
+                    print "> %s" % (full_time)
 
                     try:
                         blah = return_dict[full_time]
@@ -419,7 +456,9 @@ class Parser(object):
                         return_dict[full_time] = {}
 
                     if (part_type == PART_CPU):
-                        return_dict[full_time][elems[1]] = {
+                        return_dict[full_time][elems[
+                            (1 if is_24hr is True else 2)
+                        ]] = {
                             'usr': float(elems[
                                 self.__cpu_fields[
                                     FIELD_PAIRS_CPU['usr']]])
