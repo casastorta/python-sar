@@ -4,11 +4,6 @@
 
 .. WARNING::
    Parses SAR ASCII output only, not binary files!
-
-.. WARNING::
-   Parses SAR ASCII files only, **not** ``SAR -A`` output! \
-   (24hr output compared to AM/PM output).
-   Following versions might support ``SAR -A`` parsing.
 '''
 
 from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, \
