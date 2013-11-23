@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='sar',
-      version='0.1',
+      version='0.2',
       description='SAR (sysstat) output files parser',
       author='Vedran Krivokuca',
       author_email='dev@krivokuca.net',

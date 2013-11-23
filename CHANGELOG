@@ -1,0 +1,11 @@
+0.2 - 2013-11-23
+-----------------
+FIX: different locale times handling fixes (24hr vs 12hr AM/PM)
+
+
+0.1 - 2013-11-20
+-----------------
+Initial pre-release
+
+Known problems:
+- Doesn't handle SAR files with AM/PM outputs well
