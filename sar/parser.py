@@ -447,55 +447,47 @@ class Parser(object):
                     except KeyError:
                         return_dict[full_time] = {}
 
-                    # CPU usage summary
-                    if (part_type == PART_CPU):
-                        cpuid = elems[(1 if is_24hr is True else 2)]
+                    # Common assigner
+                    fields = None
+                    pairs = None
+                    if part_type == PART_CPU:
+                        fields = self.__cpu_fields
+                        pairs = FIELD_PAIRS_CPU
+                    elif part_type == PART_MEM:
+                        fields = self.__mem_fields
+                        pairs = FIELD_PAIRS_MEM
+                    elif part_type == PART_SWP:
+                        fields = self.__swp_fields
+                        pairs = FIELD_PAIRS_SWP
+                    elif part_type == PART_IO:
+                        fields = self.__io_fields
+                        pairs = FIELD_PAIRS_IO
 
-                        try:
-                            blah = return_dict[full_time][cpuid]
-                            del(blah)
-                        except KeyError:
-                            return_dict[full_time][cpuid] = {}
+                    for sectionname in pairs.iterkeys():
 
-                        for sectionname in FIELD_PAIRS_CPU.iterkeys():
+                        value = elems[fields[pairs[sectionname]]]
+
+                        if sectionname == 'membuffer' or \
+                                sectionname == 'memcache' or \
+                                sectionname == 'memfree' or \
+                                sectionname == 'memused' or \
+                                sectionname == 'swapfree' or \
+                                sectionname == 'swapused':
+                            value = int(value)
+                        else:
+                            value = float(value)
+
+                        if part_type == PART_CPU:
+                            cpuid = elems[(1 if is_24hr is True else 2)]
+                            try:
+                                blah = return_dict[full_time][cpuid]
+                                del(blah)
+                            except KeyError:
+                                return_dict[full_time][cpuid] = {}
                             return_dict[full_time][cpuid][sectionname] = \
-                                float(elems[self.__cpu_fields[
-                                    FIELD_PAIRS_CPU[sectionname]]])
-
-                    # RAM memory usage summary
-                    if (part_type == PART_MEM):
-                        for sectionname in FIELD_PAIRS_MEM.iterkeys():
-                            value = elems[self.__mem_fields[
-                                FIELD_PAIRS_MEM[sectionname]]]
-
-                            if sectionname == 'memusedpercent':
-                                value = float(value)
-                            else:
-                                value = int(value)
-
-                            return_dict[full_time][sectionname] = \
                                 value
-
-                    # Swap usage summary
-                    if (part_type == PART_SWP):
-                        for sectionname in FIELD_PAIRS_SWP.iterkeys():
-                            value = elems[self.__swp_fields[
-                                FIELD_PAIRS_SWP[sectionname]]]
-
-                            if sectionname == 'swapusedpercent':
-                                value = float(value)
-                            else:
-                                value = int(value)
-
-                            return_dict[full_time][sectionname] = \
-                                value
-
-                    # IO usage summary
-                    if (part_type == PART_IO):
-                        for sectionname in FIELD_PAIRS_IO.iterkeys():
-                            return_dict[full_time][sectionname] = \
-                                float(elems[self.__io_fields[
-                                    FIELD_PAIRS_IO[sectionname]]])
+                        else:
+                            return_dict[full_time][sectionname] = value
 
         return (return_dict)
 
