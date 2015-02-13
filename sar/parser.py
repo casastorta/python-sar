@@ -10,6 +10,9 @@ from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, \
     PATTERN_CPU, PATTERN_MEM, PATTERN_SWP, PATTERN_IO, PATTERN_RESTART, \
     FIELDS_CPU, FIELD_PAIRS_CPU, FIELDS_MEM, FIELD_PAIRS_MEM, FIELDS_SWP, \
     FIELD_PAIRS_SWP, FIELDS_IO, FIELD_PAIRS_IO
+
+import sar.exceptions as se
+
 import mmap
 import os
 import re
@@ -135,44 +138,40 @@ class Parser(object):
         '''
 
         # Filename passed checks through __init__
-        if ((self.__filename and os.access(self.__filename, os.R_OK))
-                or data != ''):
+        if self.__filename or data != '':
 
-            fhandle = None
+            if data != "":
+                self.__open_file()
 
-            if (data == ''):
-                try:
-                    fhandle = os.open(self.__filename, os.O_RDONLY)
-                except OSError:
-                    print(("Couldn't open file %s" % (self.__filename)))
-                    fhandle = None
-
-            if (fhandle or data != ''):
+            if self.__fp or data != '':
 
                 datalength = 0
                 dataprot = mmap.PROT_READ
 
                 if (data != ''):
-                    fhandle = -1
                     datalength = len(data)
                     dataprot = mmap.PROT_READ | mmap.PROT_WRITE
 
                 try:
+                    fileno = -1
+                    if self.__fp:
+                        fileno = self.__fp.fileno()
+                        datalength = 0
                     sarmap = mmap.mmap(
-                        fhandle, length=datalength, prot=dataprot
+                        self.__fp, length=datalength, prot=dataprot
                     )
                     if (data != ''):
-
                         sarmap.write(data)
                         sarmap.flush()
                         sarmap.seek(0, os.SEEK_SET)
 
                 except (TypeError, IndexError):
                     if (data == ''):
-                        os.close(fhandle)
-                    traceback.print_exc()
-                    #sys.exit(-1)
-                    return False
+                        self.__close_file()
+                    raise se.ParsingError(
+                        "Could not parse input file: %s" %
+                        (traceback.format_exc())
+                    )
 
                 # Here we'll store chunks of SAR file, unparsed
                 searchunks = []
@@ -188,7 +187,7 @@ class Parser(object):
                     # we measure its length
                     len(data)
 
-                #oldchunkpos = dlpos
+                # oldchunkpos = dlpos
 
                 while (dlpos > -1):  # mmap.find() returns -1 on failure.
 
@@ -217,7 +216,7 @@ class Parser(object):
                 sarmap.close()
 
             if (fhandle != -1):
-                os.close(fhandle)
+                self.__close_file()
 
             if (searchunks):
                 return searchunks
@@ -348,9 +347,6 @@ class Parser(object):
             :return: ``Dictionary`` of names => position, None for not present
         '''
         part_parts = part_first_line.split()
-
-        ### DEBUG
-        #print("Parts: %s" % (part_parts))
 
         return_dict = {}
 
@@ -560,3 +556,5 @@ class Parser(object):
             try:
                 os.close(self.__fp)
                 self.__fp = None
+            except:
+                pass
