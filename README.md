@@ -27,6 +27,9 @@ General plans for v2.0 are:
 * Change of the in-memory parsed SAR format is possible, although, at 
   this moment I find it unlikely.
 
+* Times in (Date)Time format. Old descriptive keys might be kept for
+  easier representation of data, maybe.
+
 If you are using current version of this module in your Python 
 applications, please pin to version 1.x in your requirements not to 
 experience broken compatibility in the future.
