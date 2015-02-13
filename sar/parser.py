@@ -27,8 +27,11 @@ class Parser(object):
 
     def __init__(self, filename=''):
 
+        self.__fp = None
+        '''Filepointer for SAR file'''
+
         self._sarinfo = {}
-        '''Hash with SAR info'''
+        '''Dictionary with SAR info'''
         self.__file_date = ''
         '''String which contains date of SAR file'''
         self.__restart_times = []
@@ -46,6 +49,9 @@ class Parser(object):
         '''I/O usage indexes'''
 
         return None
+
+    def __del__(self):
+        self.__close_file()
 
     def load_file(self):
         '''
@@ -532,3 +538,25 @@ class Parser(object):
             return True
 
         return False
+
+    def __open_file(self):
+        '''
+        Opens the sar file for processing
+        '''
+        if self.__fp is None:
+            if ((self.__filename and os.access(self.__filename, os.R_OK))):
+                try:
+                    filehandle = os.open(self.__filename, os.O_RDONLY)
+                except OSError:
+                    print(("Couldn't open file %s" % (self.__filename)))
+                    filehandle = None
+            self.__fp = filehandle
+
+    def __close_file(self):
+        '''
+        Closes the sar file (after) processing
+        '''
+        if self.__fp:
+            try:
+                os.close(self.__fp)
+                self.__fp = None
