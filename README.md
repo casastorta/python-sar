@@ -31,5 +31,5 @@ General plans for v2.0 are:
   easier representation of data, maybe.
 
 If you are using current version of this module in your Python 
-applications, please pin to version 1.x in your requirements not to 
+applications, please pin to version 0.x in your requirements not to 
 experience broken compatibility in the future.
