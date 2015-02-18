@@ -177,7 +177,7 @@ class Parser(object):
                 dlpos = sarmap.find("\n\n", 0)
                 size = 0
 
-                if (data == ''):
+                if data == '':
                     # We can do mmap.size() only on read-only mmaps
                     size = sarmap.size()
                 else:
@@ -187,7 +187,7 @@ class Parser(object):
 
                 # oldchunkpos = dlpos
 
-                while (dlpos > -1):  # mmap.find() returns -1 on failure.
+                while dlpos > -1:  # mmap.find() returns -1 on failure.
 
                     tempchunk = sarmap.read(dlpos - oldchunkpos)
                     searchunks.append(tempchunk.strip())
@@ -524,7 +524,7 @@ class Parser(object):
             if ((self.__filename and os.access(self.__filename, os.R_OK))):
                 try:
                     filehandle = os.open(self.__filename, os.O_RDONLY)
-                except OSError:
+                except (OSError, IOError):
                     print(("Couldn't open file %s" % (self.__filename)))
                     filehandle = None
             self.__fp = filehandle
