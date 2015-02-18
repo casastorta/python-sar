@@ -11,7 +11,7 @@ from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, \
     FIELDS_CPU, FIELD_PAIRS_CPU, FIELDS_MEM, FIELD_PAIRS_MEM, FIELDS_SWP, \
     FIELD_PAIRS_SWP, FIELDS_IO, FIELD_PAIRS_IO
 
-import sar.exceptions as se
+import sar.exceptions as sex  # :-)
 
 import mmap
 import os
@@ -120,9 +120,7 @@ class Parser(object):
                 return False
 
         except:
-            ### DEBUG
-            traceback.print_exc()
-            return False
+            raise sex.ParsingError()
 
         return self._sarinfo
 
@@ -168,7 +166,7 @@ class Parser(object):
                 except (TypeError, IndexError):
                     if (data == ''):
                         self.__close_file()
-                    raise se.ParsingError(
+                    raise sex.ParsingError(
                         "Could not parse input file: %s" %
                         (traceback.format_exc())
                     )
@@ -204,7 +202,10 @@ class Parser(object):
                     try:
                         sarmap.seek(2, os.SEEK_CUR)
                     except ValueError:
-                        print(("Out of bounds (%s)!\n" % (sarmap.tell())))
+                        raise sex.OutOfBoundsError(
+                            "Cannot reach position %s in input" %
+                            (sarmap.tell())
+                        )
                     # Now we repeat find.
                     dlpos = sarmap.find("\n\n")
 
@@ -215,7 +216,7 @@ class Parser(object):
 
                 sarmap.close()
 
-            if (fhandle != -1):
+            if fhandle != -1:
                 self.__close_file()
 
             if (searchunks):
@@ -499,41 +500,21 @@ class Parser(object):
             :return: ISO-style (YYYY-MM-DD) date from SAR file
         '''
 
-        if (os.access(self.__filename, os.R_OK)):
+        self.__open_file()
 
-            # Read first line of the file
-            try:
-                sar_file = open(self.__filename, "r")
+        firstline = self.__fp.readline()
+        info = firstline.split()
 
-            except OSError:
-                ### DEBUG
-                traceback.print_exc()
-                return False
+        try:
+            self.__file_date = info[3]
 
-            except:
-                ### DEBUG
-                traceback.print_exc()
-                return False
+        except KeyError:
+            # TODO: decide if we want this as fatal failure.
+            raise sex.ParsingError(
+                "Can't locate filedate info from input file"
+            )
 
-            firstline = sar_file.readline()
-            info = firstline.split()
-            sar_file.close()
-
-            try:
-                self.__file_date = info[3]
-
-            except KeyError:
-                self.__file_date = ''
-                return False
-
-            except:
-                ### DEBUG
-                traceback.print_exc()
-                return False
-
-            return True
-
-        return False
+        return True
 
     def __open_file(self):
         '''
