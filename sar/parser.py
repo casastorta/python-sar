@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-'''
+"""
 :mod:`sar.parser` is a module containing class for parsing SAR output files.
 
 .. WARNING::
    Parses SAR ASCII output only, not binary files!
-'''
+"""
 
 from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, \
     PATTERN_CPU, PATTERN_MEM, PATTERN_SWP, PATTERN_IO, PATTERN_RESTART, \
@@ -21,35 +21,35 @@ from types import ListType
 
 
 class Parser(object):
-    '''
+    """
     Parser for sar outputs. Uses SAR interpreter binary and parses out \
     its output
         :param filename: Name of the SAR output file
         :type filename: str.
-    '''
+    """
 
     def __init__(self, filename=''):
 
         self.__fp = None
-        '''Filepointer for SAR file'''
+        """Filepointer for SAR file"""
 
         self._sarinfo = {}
-        '''Dictionary with SAR info'''
+        """Dictionary with SAR info"""
         self.__file_date = ''
-        '''String which contains date of SAR file'''
+        """String which contains date of SAR file"""
         self.__restart_times = []
-        '''List with box restart times'''
+        """List with box restart times"""
         self.__filename = filename
-        '''SAR output filename to be parsed'''
+        """SAR output filename to be parsed"""
 
         self.__cpu_fields = None
-        '''CPU fields indexes'''
+        """CPU fields indexes"""
         self.__mem_fields = None
-        '''Memory usage indexes'''
+        """Memory usage indexes"""
         self.__swp_fields = None
-        '''Swap usage indexes'''
+        """Swap usage indexes"""
         self.__io_fields = None
-        '''I/O usage indexes'''
+        """I/O usage indexes"""
 
         return None
 
@@ -57,11 +57,11 @@ class Parser(object):
         self.__close_file()
 
     def load_file(self):
-        '''
+        """
         Loads SAR format logfile in ASCII format (sarXX).
             :return: ``True`` if loading and parsing of file went fine, \
             ``False`` if it failed (at any point)
-        '''
+        """
 
         # We first split file into pieces
         searchunks = self._split_file()
@@ -92,10 +92,10 @@ class Parser(object):
             return False
 
     def get_filedate(self):
-        '''
+        """
         Returns file date of SAR file
             :return: ISO format (YYYY-MM-DD) of a SAR file
-        '''
+        """
         if (self.__file_date == ''):
             # If not already parsed out, parse it.
             self.__get_filedate()
@@ -103,10 +103,10 @@ class Parser(object):
         return self.__file_date
 
     def get_sar_info(self):
-        '''
+        """
         Returns parsed sar info
             :return: ``Dictionary``-style list of SAR data
-        '''
+        """
 
         try:
             test = self._sarinfo["cpu"]
@@ -125,7 +125,7 @@ class Parser(object):
         return self._sarinfo
 
     def _split_file(self, data=''):
-        '''
+        """
         Splits SAR output or SAR output file (in ASCII format) in order to
         extract info we need for it, in the format we want.
             :param data: Input data instead of file
@@ -133,7 +133,7 @@ class Parser(object):
             :return: ``List``-style of SAR file sections separated by
                 the type of info they contain (SAR file sections) without
                 parsing what is exactly what at this point
-        '''
+        """
 
         # Filename passed checks through __init__
         if self.__filename or data != '':
@@ -227,12 +227,12 @@ class Parser(object):
         return False
 
     def _parse_file(self, sar_parts):
-        '''
+        """
         Parses splitted file to get proper information from split parts.
             :param sar_parts: Array of SAR file parts
             :return: ``Dictionary``-style info (but still non-parsed) \
                 from SAR file, split into sections we want to check
-        '''
+        """
         cpu_usage = ''
         mem_usage = ''
         swp_usage = ''
@@ -248,11 +248,11 @@ class Parser(object):
             io_pattern = re.compile(PATTERN_IO)
             restart_pattern = re.compile(PATTERN_RESTART)
 
-            ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
-            '''              ********** ATTENTION *******            '''
-            ''' THERE CAN BE MORE THAN ONE SAME SECTION IN ONE FILE  '''
-            ''' IF SYSTEM WAS REBOOTED DURING THE DAY                '''
-            ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
+            """ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! """
+            """              ********** ATTENTION *******            """
+            """ THERE CAN BE MORE THAN ONE SAME SECTION IN ONE FILE  """
+            """ IF SYSTEM WAS REBOOTED DURING THE DAY                """
+            """ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! """
 
             for part in sar_parts:
 
@@ -339,14 +339,14 @@ class Parser(object):
         return (False, False, False)
 
     def __find_column(self, column_names, part_first_line):
-        '''
+        """
         Finds the column for the column_name in sar type definition,
         and returns its index.
             :param column_name: Names of the column we look for (regex) put in
                 the list
             :param part_first_line: First line of the SAR part
             :return: ``Dictionary`` of names => position, None for not present
-        '''
+        """
         part_parts = part_first_line.split()
 
         return_dict = {}
@@ -372,14 +372,14 @@ class Parser(object):
         return(return_dict)
 
     def __split_info(self, info_part, part_type=PART_CPU):
-        '''
+        """
         Splits info from SAR parts into logical stuff :-)
         :param info_part: Part of SAR output we want to split into usable data
         :param part_type: Value of a constant which tells us which SAR part \
             we're parsing (because of their specifics)
         :return: ``List``-style info from SAR files, now finally \
             completely parsed into meaningful data for further processing
-        '''
+        """
 
         pattern = ''
 
@@ -495,10 +495,10 @@ class Parser(object):
         return (return_dict)
 
     def __get_filedate(self):
-        '''
+        """
         Parses (extracts) date of SAR data, from the SAR output file itself.
             :return: ISO-style (YYYY-MM-DD) date from SAR file
-        '''
+        """
 
         self.__open_file()
 
@@ -520,18 +520,18 @@ class Parser(object):
         return True
 
     def __open_file(self):
-        '''
+        """
         Opens the sar file for processing
-        '''
+        """
         if self.__fp is None:
             if ((self.__filename and os.access(self.__filename, os.R_OK))):
                 filehandle = os.open(self.__filename, os.O_RDONLY)
                 self.__fp = filehandle
 
     def __close_file(self):
-        '''
+        """
         Closes the sar file (after) processing
-        '''
+        """
         if self.__fp:
             try:
                 os.close(self.__fp)
