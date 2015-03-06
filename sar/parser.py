@@ -502,6 +502,9 @@ class Parser(object):
 
         self.__open_file()
 
+        # Seek to the beginning of the file
+        self.__fp.seek(0)
+
         firstline = self.__fp.readline()
         info = firstline.split()
 
