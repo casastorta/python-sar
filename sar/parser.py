@@ -522,12 +522,8 @@ class Parser(object):
         '''
         if self.__fp is None:
             if ((self.__filename and os.access(self.__filename, os.R_OK))):
-                try:
-                    filehandle = os.open(self.__filename, os.O_RDONLY)
-                except (OSError, IOError):
-                    print(("Couldn't open file %s" % (self.__filename)))
-                    filehandle = None
-            self.__fp = filehandle
+                filehandle = os.open(self.__filename, os.O_RDONLY)
+                self.__fp = filehandle
 
     def __close_file(self):
         '''
