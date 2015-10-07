@@ -15,6 +15,7 @@ import os
 import re
 import traceback
 from types import ListType
+import platform
 
 
 class Parser(object):
@@ -144,17 +145,31 @@ class Parser(object):
             if (fhandle or data != ''):
 
                 datalength = 0
-                dataprot = mmap.PROT_READ
+                
+                # Dealing with mmap difference on Windows and Linux
+                if platform.system() == 'Windows':
+                    dataprot = mmap.ACCESS_READ
+                else:
+                    dataprot = mmap.PROT_READ
 
                 if (data != ''):
                     fhandle = -1
                     datalength = len(data)
-                    dataprot = mmap.PROT_READ | mmap.PROT_WRITE
+                    
+                    if platform.system() == 'Windows':    
+                        dataprot = mmap.ACCESS_READ | mmap.ACCESS_WRITE
+                    else:
+                        dataprot = mmap.PROT_READ | mmap.PROT_WRITE                    
 
                 try:
-                    sarmap = mmap.mmap(
-                        fhandle, length=datalength, prot=dataprot
-                    )
+                    if platform.system() == 'Windows':
+                        sarmap = mmap.mmap(
+                            fhandle, length=datalength, access=dataprot
+                        )
+                    else:
+                        sarmap = mmap.mmap(
+                            fhandle, length=datalength, prot=dataprot
+                        )
                     if (data != ''):
 
                         sarmap.write(data)
