@@ -13,6 +13,9 @@ PART_SWP = 2
 """I/O usage part of SAR file"""
 PART_IO = 3
 
+"""Task creation and system switching part of SAR file"""
+PART_TASK = 4
+
 """CPU regexp pattern for detecting SAR section header"""
 PATTERN_CPU = ".*CPU.*(usr|user).*nice.*sys.*"
 
@@ -59,16 +62,28 @@ FIELD_PAIRS_SWP = {
 """I/O usage regexp pattern for detecting SAR section header"""
 PATTERN_IO = ".*tps.*rtps.*wtps.*bread\/s.*bwrtn\/s.*"
 
-"""Regexp terms for finding fields in SAR parts for swap usage"""
+"""Regexp terms for finding fields in SAR parts for I/O usage"""
 FIELDS_IO = [
     '^tps', '^rtps', '^wtps', 'bread\/s', 'bwrtn\/s'
 ]
 
-"""Pair regexp terms with field names in swap usage output dictionary"""
+"""Pair regexp terms with field names in I/O usage output dictionary"""
 FIELD_PAIRS_IO = {
     'tps': FIELDS_IO[0], 'rtps': FIELDS_IO[1], 'wtps': FIELDS_IO[2],
     'bread': FIELDS_IO[3], 'bwrite': FIELDS_IO[4],
+}
 
+"""Task creation and system switching regexp pattern for SAR section header"""
+PATTERN_TASK = ".*proc\/s.*cswch\/s.*"
+
+"""Regexp terms for finding fields in SAR parts for task creation and system switching"""
+FIELDS_TASK = [
+    'proc', 'cswch'
+]
+
+"""Pair regexp terms with field names in Task creation and system switching output dictionary"""
+FIELD_PAIRS_TASK = {
+    'proc': FIELDS_TASK[0], 'cswch': FIELDS_TASK[1]
 }
 
 """Restart time regexp pattern for detecting SAR restart notices"""

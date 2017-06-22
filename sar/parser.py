@@ -6,15 +6,14 @@
    Parses SAR ASCII output only, not binary files!
 '''
 
-from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, \
+from sar import PART_CPU, PART_MEM, PART_SWP, PART_IO, PART_TASK, \
     PATTERN_CPU, PATTERN_MEM, PATTERN_SWP, PATTERN_IO, PATTERN_RESTART, \
     FIELDS_CPU, FIELD_PAIRS_CPU, FIELDS_MEM, FIELD_PAIRS_MEM, FIELDS_SWP, \
-    FIELD_PAIRS_SWP, FIELDS_IO, FIELD_PAIRS_IO
+    FIELD_PAIRS_SWP, FIELDS_IO, FIELD_PAIRS_IO, PATTERN_TASK, FIELDS_TASK, FIELD_PAIRS_TASK
 import mmap
 import os
 import re
 import traceback
-from types import ListType
 import platform
 
 
@@ -45,8 +44,8 @@ class Parser(object):
         '''Swap usage indexes'''
         self.__io_fields = None
         '''I/O usage indexes'''
-
-        return None
+        self.__task_fields = None
+        '''task creation indexes'''
 
     def load_file(self):
         '''
@@ -246,15 +245,17 @@ class Parser(object):
         mem_usage = ''
         swp_usage = ''
         io_usage = ''
+        task_usage = ''
 
         # If sar_parts is a list
-        if (type(sar_parts) is ListType):
+        if (type(sar_parts) is list):
             # We will find CPU section by looking for typical line in CPU
             # section of SAR output
             cpu_pattern = re.compile(PATTERN_CPU)
             mem_pattern = re.compile(PATTERN_MEM)
             swp_pattern = re.compile(PATTERN_SWP)
             io_pattern = re.compile(PATTERN_IO)
+            task_pattern = re.compile(PATTERN_TASK)
             restart_pattern = re.compile(PATTERN_RESTART)
 
             ''' !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! '''
@@ -323,6 +324,21 @@ class Parser(object):
                     else:
                         io_usage += "\n" + part
 
+                # Try to match task creation SAR file sections
+                if (task_pattern.search(part)):
+                    print("TASK")
+                    if (task_usage == ''):
+                        task_usage = part
+                        try:
+                            first_line = part.split("\n")[0]
+                        except IndexError:
+                            first_line = part
+
+                        self.__task_fields = \
+                            self.__find_column(FIELDS_TASK, first_line)
+                    else:
+                        task_usage += "\n" + part
+
                 # Try to match restart time
                 if (restart_pattern.search(part)):
                     pieces = part.split()
@@ -337,15 +353,17 @@ class Parser(object):
             mem_output = self.__split_info(mem_usage, PART_MEM)
             swp_output = self.__split_info(swp_usage, PART_SWP)
             io_output = self.__split_info(io_usage, PART_IO)
+            task_output = self.__split_info(task_usage, PART_TASK)
 
             del(cpu_usage)
             del(mem_usage)
             del(swp_usage)
             del(io_usage)
+            del(task_usage)
 
-            return (cpu_output, mem_output, swp_output, io_output)
+            return (cpu_output, mem_output, swp_output, io_output, task_output)
 
-        return (False, False, False)
+        return (False, False, False, False, False)
 
     def __find_column(self, column_names, part_first_line):
         '''
@@ -403,6 +421,8 @@ class Parser(object):
             pattern = PATTERN_SWP
         elif (part_type == PART_IO):
             pattern = PATTERN_IO
+        elif (part_type == PART_TASK):
+            pattern = PATTERN_TASK
 
         if (pattern == ''):
             return False
@@ -477,6 +497,12 @@ class Parser(object):
                     elif part_type == PART_IO:
                         fields = self.__io_fields
                         pairs = FIELD_PAIRS_IO
+                    elif part_type == PART_TASK:
+                        fields = self.__task_fields
+                        pairs = FIELD_PAIRS_TASK
+
+                    print(part_type)
+                    print(list(pairs.iterkeys()))
 
                     for sectionname in pairs.iterkeys():
 
