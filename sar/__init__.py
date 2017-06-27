@@ -95,8 +95,36 @@ PATTERN_MULTISPLIT = "Linux"
 """Split by date in multiday SAR file"""
 PATTERN_DATE = "[0-9][0-9][0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]"
 
+ALL_PATTERNS = {
+    "CPU": {
+        "PATTERN": PATTERN_CPU,
+        "FIELDS": FIELDS_CPU,
+        "PAIRS": FIELD_PAIRS_CPU
+    },
+    "MEM": {
+        "PATTERN": PATTERN_MEM,
+        "FIELDS": FIELDS_MEM,
+        "PAIRS": FIELD_PAIRS_MEM
+    },
+    "SWP": {
+        "PATTERN": PATTERN_SWP,
+        "FIELDS": FIELDS_SWP,
+        "PAIRS": FIELD_PAIRS_SWP
+    },
+    "IO": {
+        "PATTERN": PATTERN_IO,
+        "FIELDS": FIELDS_IO,
+        "PAIRS": FIELD_PAIRS_IO
+    },
+    "TASK": {
+        "PATTERN": PATTERN_TASK,
+        "FIELDS": FIELDS_TASK,
+        "PAIRS": FIELD_PAIRS_TASK
+
+    }
+}
+
 __all__ = [
-    "PART_CPU", "PART_MEM", "PART_SWP", "PART_IO",
-    "PATTERN_CPU", "PATTERN_MEM", "PATTERN_SWP", "PATTERN_IO",
-    "PATTERN_RESTART", "PATTERN_MULTISPLIT", "PATTERN_DATE"
+    "PATTERN_RESTART", "PATTERN_MULTISPLIT",
+    "PATTERN_DATE", "ALL_PATTERNS"
 ]
