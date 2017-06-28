@@ -51,7 +51,7 @@ class Parser(object):
             # And then we parse pieces into meaningful data
             usage = self._parse_file(searchunks)
 
-            if "CPU" in usage:
+            if 'CPU' in usage:
                 return False
 
             self._sarinfo = usage
@@ -164,7 +164,7 @@ class Parser(object):
                 # Here we'll store chunks of SAR file, unparsed
                 searchunks = []
                 oldchunkpos = 0
-                dlpos = sarmap.find("\n\n", 0)
+                dlpos = sarmap.find('\n\n', 0)
                 size = 0
 
                 if data == '':
@@ -192,7 +192,7 @@ class Parser(object):
                     try:
                         sarmap.seek(2, os.SEEK_CUR)
                     except ValueError:
-                        print(("Out of bounds (%s)!\n" % (sarmap.tell())))
+                        print(('Out of bounds (%s)!\n' % (sarmap.tell())))
                     # Now we repeat find.
                     dlpos = sarmap.find("\n\n")
 
@@ -235,22 +235,22 @@ class Parser(object):
 
             for PATTERNSNAME in ALL_PATTERNS:
                 patterns = ALL_PATTERNS[PATTERNSNAME]
-                rgxpattern = re.compile(patterns["PATTERN"])
+                rgxpattern = re.compile(patterns['PATTERN'])
 
                 for part in sar_parts:
 
                     if rgxpattern.search(part):
 
                         if PATTERNSNAME in usage:
-                            usage[PATTERNSNAME] += "\n" + part
+                            usage[PATTERNSNAME] += '\n' + part
                         else:
                             usage[PATTERNSNAME] = part
                             try:
-                                first_line = part.split("\n")[0]
+                                first_line = part.split('\n')[0]
                             except IndexError:
                                 first_line = part
 
-                            self.__fields[PATTERNSNAME] = self.__find_column(patterns["FIELDS"], first_line)
+                            self.__fields[PATTERNSNAME] = self.__find_column(patterns['FIELDS'], first_line)
 
                     # Try to match restart time
                     if restart_pattern.search(part):
@@ -317,7 +317,7 @@ class Parser(object):
             completely parsed into meaningful data for further processing
         """
 
-        pattern = patterns["PATTERN"]
+        pattern = patterns['PATTERN']
         if pattern == '':
             return False
 
@@ -325,10 +325,9 @@ class Parser(object):
 
         pattern_re = re.compile(pattern)
 
-        for part_line in info_part.split("\n"):
+        for part_line in info_part.split('\n'):
 
-            if part_line.strip() != '' and \
-                    not pattern_re.search(part_line):
+            if part_line.strip() != '' and not pattern_re.search(part_line):
 
                 # Take care of AM/PM timestamps in SAR file
                 is_24hr = True
@@ -342,10 +341,7 @@ class Parser(object):
                     is_AM = False
 
                 if is_24hr is False:
-                    part_line =  \
-                        ('%s_%s XX %s' % (
-                            part_line[:8], part_line[9:11], part_line[12:]
-                        ))
+                    part_line =  ('%s_%s XX %s' % (part_line[:8], part_line[9:11], part_line[12:]))
 
                 # Line is not empty, nor it's header.
                 # let's hit the road Jack!
@@ -392,7 +388,7 @@ class Parser(object):
                         else:
                             value = float(value)
 
-                        if patternsname == "CPU":
+                        if patternsname == 'CPU':
                             cpuid = elems[(1 if is_24hr is True else 2)]
                             try:
                                 blah = return_dict[full_time][cpuid]

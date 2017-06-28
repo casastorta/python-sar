@@ -1,21 +1,6 @@
 #!/usr/bin/env python
 
 
-"""Indicates CPU part of SAR file"""
-PART_CPU = 0
-
-"""Indicates RAM memory usage part of SAR file"""
-PART_MEM = 1
-
-"""Indicates swap memory usage part of SAR file"""
-PART_SWP = 2
-
-"""I/O usage part of SAR file"""
-PART_IO = 3
-
-"""Task creation and system switching part of SAR file"""
-PART_TASK = 4
-
 """CPU regexp pattern for detecting SAR section header"""
 PATTERN_CPU = ".*CPU.*(usr|user).*nice.*sys.*"
 
@@ -31,7 +16,7 @@ FIELD_PAIRS_CPU = {
 }
 
 """Mem usage regexp pattern for detecting SAR section header"""
-PATTERN_MEM = ".*kbmemfree.*kbmemused.*memused.*kbbuffers.*kbcached.*"
+PATTERN_MEM = '.*kbmemfree.*kbmemused.*memused.*kbbuffers.*kbcached.*'
 
 """Regexp terms for finding fields in SAR parts for memory usage"""
 FIELDS_MEM = [
@@ -46,7 +31,7 @@ FIELD_PAIRS_MEM = {
 }
 
 """Swap usage regexp pattern for detecting SAR section header"""
-PATTERN_SWP = ".*kbswpfree.*kbswpused.*swpused.*"
+PATTERN_SWP = '.*kbswpfree.*kbswpused.*swpused.*'
 
 """Regexp terms for finding fields in SAR parts for swap usage"""
 FIELDS_SWP = [
@@ -60,7 +45,7 @@ FIELD_PAIRS_SWP = {
 }
 
 """I/O usage regexp pattern for detecting SAR section header"""
-PATTERN_IO = ".*tps.*rtps.*wtps.*bread\/s.*bwrtn\/s.*"
+PATTERN_IO = '.*tps.*rtps.*wtps.*bread\/s.*bwrtn\/s.*'
 
 """Regexp terms for finding fields in SAR parts for I/O usage"""
 FIELDS_IO = [
@@ -74,7 +59,7 @@ FIELD_PAIRS_IO = {
 }
 
 """Task creation and system switching regexp pattern for SAR section header"""
-PATTERN_TASK = ".*proc\/s.*cswch\/s.*"
+PATTERN_TASK = '.*proc\/s.*cswch\/s.*'
 
 """Regexp terms for finding fields in SAR parts for task creation and system switching"""
 FIELDS_TASK = [
@@ -87,44 +72,44 @@ FIELD_PAIRS_TASK = {
 }
 
 """Restart time regexp pattern for detecting SAR restart notices"""
-PATTERN_RESTART = ".*LINUX\ RESTART.*"
+PATTERN_RESTART = '.*LINUX\ RESTART.*'
 
 """Pattern for splitting multiple combined SAR file"""
-PATTERN_MULTISPLIT = "Linux"
+PATTERN_MULTISPLIT = 'Linux'
 
 """Split by date in multiday SAR file"""
-PATTERN_DATE = "[0-9][0-9][0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]"
+PATTERN_DATE = '[0-9][0-9][0-9][0-9]\-[0-9][0-9]\-[0-9][0-9]'
 
 ALL_PATTERNS = {
-    "CPU": {
-        "PATTERN": PATTERN_CPU,
-        "FIELDS": FIELDS_CPU,
-        "PAIRS": FIELD_PAIRS_CPU
+    'CPU': {
+        'PATTERN': PATTERN_CPU,
+        'FIELDS': FIELDS_CPU,
+        'PAIRS': FIELD_PAIRS_CPU
     },
-    "MEM": {
-        "PATTERN": PATTERN_MEM,
-        "FIELDS": FIELDS_MEM,
-        "PAIRS": FIELD_PAIRS_MEM
+    'MEM': {
+        'PATTERN': PATTERN_MEM,
+        'FIELDS': FIELDS_MEM,
+        'PAIRS': FIELD_PAIRS_MEM
     },
-    "SWP": {
-        "PATTERN": PATTERN_SWP,
-        "FIELDS": FIELDS_SWP,
-        "PAIRS": FIELD_PAIRS_SWP
+    'SWP': {
+        'PATTERN': PATTERN_SWP,
+        'FIELDS': FIELDS_SWP,
+        'PAIRS': FIELD_PAIRS_SWP
     },
-    "IO": {
-        "PATTERN": PATTERN_IO,
-        "FIELDS": FIELDS_IO,
-        "PAIRS": FIELD_PAIRS_IO
+    'IO': {
+        'PATTERN': PATTERN_IO,
+        'FIELDS': FIELDS_IO,
+        'PAIRS': FIELD_PAIRS_IO
     },
-    "TASK": {
-        "PATTERN": PATTERN_TASK,
-        "FIELDS": FIELDS_TASK,
-        "PAIRS": FIELD_PAIRS_TASK
+    'TASK': {
+        'PATTERN': PATTERN_TASK,
+        'FIELDS': FIELDS_TASK,
+        'PAIRS': FIELD_PAIRS_TASK
 
     }
 }
 
 __all__ = [
-    "PATTERN_RESTART", "PATTERN_MULTISPLIT",
-    "PATTERN_DATE", "ALL_PATTERNS"
+    'PATTERN_RESTART', 'PATTERN_MULTISPLIT',
+    'PATTERN_DATE', 'ALL_PATTERNS'
 ]
